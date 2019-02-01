@@ -6,3 +6,39 @@
     padding-top: 10ex;
     text-align: center;
 }
+
+.finished {
+    background-image: linear-gradient(slategrey,lightgray);
+}
+
+.unfinished {
+    background-image: linear-gradient(lightsteelblue, lightblue);
+}
+
+td, th {
+    background-clip: padding-box;
+    border-radius: 10px;
+    background-color: black;
+    padding: 10px;
+    border: 4px solid black;
+    vertical-align: middle;
+    horiz-align: center;
+    text-align: center;
+    font-size: 58pt;
+    margin-left:auto;
+    margin-right:auto;
+    height: 130px;
+    width: 70px;
+}
+
+.header {
+    border-spacing: 2px;
+    border-color: black;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.table {
+    margin-left:auto;
+    margin-right:auto;
+}
