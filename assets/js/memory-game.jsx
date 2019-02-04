@@ -104,7 +104,7 @@ class Memory extends React.Component {
   }
 
   // resets to initial state on selection of game restart
-  restart_game(ev) {
+  restart_game() {
     this.setState({
       score: 0,
       isRunning: true,
