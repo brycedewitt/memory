@@ -2,170 +2,48 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
-export default function game_init(root) {
-  ReactDOM.render(<Memory />, root);
+export default function game_init(root, channel) {
+  ReactDOM.render(<Memory channel={channel}/>, root);
 }
 
 class Memory extends React.Component {
   constructor(props) {
     super(props);
+    this.channel = props.channel;
     this.state = {
-      score: 0,
-      clicksEnabled: true,
-      isTileSelected: false,
-      tileSelected: 20,
-      tiles: [
-        {key: 0, letter: "A", finished: false},
-        {key: 1, letter: "B", finished: false},
-        {key: 2, letter: "C", finished: false},
-        {key: 3, letter: "D", finished: false},
-        {key: 4, letter: "E", finished: false},
-        {key: 5, letter: "F", finished: false},
-        {key: 6, letter: "G", finished: false},
-        {key: 7, letter: "H", finished: false},
-        {key: 8, letter: "A", finished: false},
-        {key: 9, letter: "B", finished: false},
-        {key: 10, letter: "C", finished: false},
-        {key: 11, letter: "D", finished: false},
-        {key: 12, letter: "E", finished: false},
-        {key: 13, letter: "F", finished: false},
-        {key: 14, letter: "G", finished: false},
-        {key: 15, letter: "H", finished: false}],
+      score: 1,
+      tiles: [],
     };
+
+    this.channel
+        .join()
+        .receive("ok", this.got_view.bind(this))
+        .receive("error", resp => { console.log("Unable to join", resp); });
   }
 
-
-  mark_selected_tiles(ii) {
-    if (!this.state.isTileSelected) {
-      let setFinishedTiles = [...this.state.tiles];
-      let setFinishedTile = {...setFinishedTiles[ii]};
-      setFinishedTile.finished = true;
-      setFinishedTiles[ii] = setFinishedTile;
-
-      setFinishedTile.finished = true;
-      let scoreUpdate = this.state.score;
-
-      this.setState({tileSelected: ii, isTileSelected: true, tiles: setFinishedTiles, score: scoreUpdate+1});
-      return;
-    } else {
-      let setFinishedTiles = [...this.state.tiles];
-      let setFinishedTile = {...setFinishedTiles[ii]};
-      setFinishedTile.finished = true;
-      setFinishedTiles[ii] = setFinishedTile;
-
-      this.setState({tiles: setFinishedTiles});
-      this.compare_tiles(ii);
-    }
+  got_view(view) {
+    console.log(view);
+    this.setState(view.game);
   }
 
-
-  tile_clicked(ii) {
-
-    if (!this.state.clicksEnabled) {
-      return;
-    }
-
-    let setFinishedTile = {...this.state.tiles[ii]};
-    setFinishedTile.finished = true;
-
-    this.mark_selected_tiles(ii);
+  on_click(ev) {
+    console.log("tile has been clicked, the on_click message has been pushed up the channel:", ev);
+    this.channel.push("guess", {tile: ev}, this.channel.transport_PID)
+        .receive("ok", this.got_view.bind(this));
   }
 
-  compare_tiles(ii) {
-
-    if (this.state.tiles[this.state.tileSelected].letter == this.state.tiles[ii].letter) {
-      var newScore = this.state.score - 1;
-
-      var copyTiles = [...this.state.tiles];
-      var setTile1 = {...copyTiles[this.state.tileSelected]};
-      var setTile2 = {...copyTiles[ii]};
-
-      setTile1.finished = true;
-      setTile2.finished = true;
-
-      copyTiles[this.state.tileSelected] = setTile1;
-      copyTiles[ii] = setTile2;
-
-      this.setState({tileSelected: 0, isTileSelected: false, tiles: copyTiles, score: newScore})
-    } else {
-      this.state.clicksEnabled = false;
-      this.forceUpdate();
-      window.setTimeout(this.wrong_tile.bind(this, ii), 1000);
-    }
-
+  on_reset() {
+    console.log("reset message sent");
+    this.channel.push("restart")
+        .receive("ok", this.got_view.bind(this))
   }
-
-  wrong_tile(ii) {
-    this.state.tiles[this.state.tileSelected].finished = false;
-    this.state.tiles[ii].finished = false;
-    this.state.isTileSelected = false;
-    this.state.clicksEnabled = true;
-    this.forceUpdate();
-  }
-
-  // resets to initial state on selection of game restart
-  restart_game(ev) {
-    this.setState({
-      score: 0,
-      isRunning: true,
-      isTileSelected: false,
-      tileSelected: 0,
-      tiles: [
-        {key: 0, letter: "A", finished: false},
-        {key: 1, letter: "B", finished: false},
-        {key: 2, letter: "C", finished: false},
-        {key: 3, letter: "D", finished: false},
-        {key: 4, letter: "E", finished: false},
-        {key: 5, letter: "F", finished: false},
-        {key: 6, letter: "G", finished: false},
-        {key: 7, letter: "H", finished: false},
-        {key: 8, letter: "A", finished: false},
-        {key: 9, letter: "B", finished: false},
-        {key: 10, letter: "C", finished: false},
-        {key: 11, letter: "D", finished: false},
-        {key: 12, letter: "E", finished: false},
-        {key: 13, letter: "F", finished: false},
-        {key: 14, letter: "G", finished: false},
-        {key: 15, letter: "H", finished: false}],
-    });
-
-    var shuffleTiles = [
-      {key: 0, letter: "A", finished: false},
-      {key: 1, letter: "B", finished: false},
-      {key: 2, letter: "C", finished: false},
-      {key: 3, letter: "D", finished: false},
-      {key: 4, letter: "E", finished: false},
-      {key: 5, letter: "F", finished: false},
-      {key: 6, letter: "G", finished: false},
-      {key: 7, letter: "H", finished: false},
-      {key: 8, letter: "A", finished: false},
-      {key: 9, letter: "B", finished: false},
-      {key: 10, letter: "C", finished: false},
-      {key: 11, letter: "D", finished: false},
-      {key: 12, letter: "E", finished: false},
-      {key: 13, letter: "F", finished: false},
-      {key: 14, letter: "G", finished: false},
-      {key: 15, letter: "H", finished: false}];
-    for (var i = shuffleTiles.length - 1; i > 0; i--) {
-      var x = Math.floor(Math.random() * (i + 1));
-      var acc = shuffleTiles[i];
-      shuffleTiles[i] = shuffleTiles[x];
-      shuffleTiles[x] = acc;
-    }
-
-    this.setState({tiles: shuffleTiles});
-  }
-
-
-
-
 
 
   render() {
-    let tiles  =  _.map(this.state.tiles, (tile, ii) => {
-      return <ConstructTiles key={tile.key} number={tile.number} letter={tile.letter} finished={tile.finished} click={this.tile_clicked.bind(this, ii)}/>
-    });
 
+    let tiles  =  _.map(this.state.tiles, (tile, ii) => {
+      return <ConstructTiles key={tile.key} number={tile.key} letter={tile.letter} finished={tile.finished} click={this.on_click.bind(this, tile.key)}/>
+    });
 
     let score = this.state.score;
 
@@ -173,8 +51,8 @@ class Memory extends React.Component {
           <div>
             <h1 id="display" colSpan="4" className='header'>Memory</h1>
             <h2> Running Score: {score} </h2>
-            <button id="restart-button" onClick={this.restart_game.bind(this)}>Restart</button>
-          <table class="center">
+            <button id="restart-button" onClick={() => this.on_reset()}>Restart</button>
+          <table>
             <tbody>
             <tr>
             {tiles[0]}
