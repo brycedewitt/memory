@@ -4,8 +4,18 @@
     <meta charset="utf-8"/>
     <title>React</title>
 
+    <script>
+      window.userToken = "TODO";
+    </script>
 </head>
 
 <body>
-<div id="root">React app loading...</div>
+
+<h1> Enter game name: </h1>
+<form action="/game/:name" method="get">
+Game:<br>
+<input type="text" name="game"><br>
+<input type="submit" value="submit">
+
+</form>
 </body>
