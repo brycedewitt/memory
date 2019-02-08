@@ -28,7 +28,7 @@ class Memory extends React.Component {
 
   on_click(ev) {
     console.log("tile has been clicked, the on_click message has been pushed up the channel:", ev);
-    this.channel.push("guess", {tile: ev}, this.channel.transport_PID)
+    this.channel.push("guess", {tile: ev})
         .receive("ok", this.got_view.bind(this));
   }
 

@@ -16,6 +16,5 @@
 Game:<br>
 <input type="text" name="game"><br>
 <input type="submit" value="submit">
-
 </form>
 </body>

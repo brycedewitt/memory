@@ -25,10 +25,22 @@ import socket from "./socket";
  //   .receive("ok", resp => { console.log("Joined successfully", resp) })
   //  .receive("error", resp => { console.log("Unable to join", resp) })
 
+// URL Parsing function from HTML-online.com
+// https://html-online.com/articles/get-url-parameters-javascript/
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+    vars[key] = value;
+  });
+  return vars;
+}
+
 function start() {
+  let id = getUrlVars()['game'];
   let root = document.getElementById('root');
+  console.log(root)
   if (root) {
-    let channel = socket.channel("games:" + window.gameName, {});
+    let channel = socket.channel("games:" + id, {});
     // We want to join in the react component.
     game_init(root, channel);
   }

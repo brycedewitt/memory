@@ -7,10 +7,12 @@ defmodule MemoryWeb.GameChannel do
 
   def join("games:" <> name, payload, socket) do
     if true do  ## was authorized?(payload)
-      game = Game.new()
+      IO.inspect(name)
+      game = Memory.BackupAgent.get(name) || Game.new()
       socket = socket
                |> assign(:game, game)
                |> assign(:name, name)
+      Memory.BackupAgent.put(name, game)
       {:ok, %{"join" => name, "game" => Game.client_view(game)}, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -19,8 +21,10 @@ defmodule MemoryWeb.GameChannel do
 
   def handle_in("guess", %{"tile" => ii}, socket) do
     IO.inspect("handle_in method for guess message has been called")
+    name = socket.assigns[:name]
     game = Game.guess(socket.assigns[:game], ii)
     socket = assign(socket, :game, game)
+    Memory.BackupAgent.put(name, game)
     {:reply, {:ok, %{ "game" => Game.client_view(game)}}, socket}
   end
 
