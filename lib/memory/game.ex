@@ -62,7 +62,7 @@ defmodule Memory.Game do
         game1 = List.replace_at(yy, tile, updateTile1)
         game2 = List.replace_at(game1, xx, updateTile2)
         game3 = Map.put(game, :tiles, game2)
-        game4 = Map.put(game3, :score, score+1)
+        game4 = Map.put(game3, :score, score)
         game5 = Map.put(game4, :isTileSelected, false)
         game5
 
